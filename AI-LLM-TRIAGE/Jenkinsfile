@@ -23,7 +23,7 @@ pipeline {
         stage('Test') {
             steps {
                 sh '''
-                    sudo pytest tests/test_gmail_login.py --junitxml=test-results.xml >> build.log 2>&1 || exit 1
+                    pytest tests/test_gmail_login.py --junitxml=test-results.xml >> build.log 2>&1 || exit 1
                 '''
             }
         }
@@ -62,13 +62,48 @@ pipeline {
                             requestBody: groovy.json.JsonOutput.toJson([
                                 model: 'codellama',
                                 prompt: """
-                                Triage the following Jenkins pipeline error log and identify the cause of the failure. Suggest possible fixes or next steps for debugging. Keep the response concise and structured:
-                                - **Failure Cause**: [Describe the root cause]
-                                - **Suggested Fix**: [Provide actionable steps]
-                                - **Additional Notes**: [Optional context or warnings]
-                                
-                                Error Log:
-                                ${consoleLog}
+                                You are **BuildGPT**, a CI/CD and QA incident response specialist.
+ 
+                            When given a Jenkins pipeline failure, you will:
+                            
+                            1. **Locate** the failing **stage/step** (or report “UNKNOWN”).  
+                            2. Summarize the **root cause** in ≤2 sentences.  
+                            3. Provide **actionable fixes**—ordered, precise, and ready to execute.  
+                            4. If a test snippet is provided, **review** it and:
+                            - Highlight the faulty line(s)
+                            - Suggest how to correct or harden the test  
+                            5. Quote up to **5 log lines** as evidence.  
+                            6. Offer “**Next Steps**” if the issue persists.
+                            
+                            ‼️ **Reply *exactly* in this Markdown template** (no extra text):
+                            
+                            **Failure Stage**: <stage-name OR “UNKNOWN”>  
+                            **Root Cause**: <one-sentence summary>
+                            
+                            **Recommended Fix**:
+                            1. <step 1>
+                            2. <step 2>
+                            3. <step 3>
+                            
+                            **Key Evidence**:
+                            **Test Code Review**${failedTest ? "" : " _(none provided)_"}:
+
+                            
+                            
+                            <if provided: show faulty lines + correction suggestion>
+                            
+                            Plain Text
+                            **Next Steps if Unresolved**:
+                            - <idea 1>
+                            - <idea 2>
+
+                            ---
+
+                            **Console Log (truncated)** 
+                            ${consoleLog}
+
+                            ${failedTest ? "🔹 **Suspect Test Snippet** 🔹\n```groovy\n${failedTest}\n```" : ""}
+
                                 """
                             ]),
                             validResponseCodes: '200:299',

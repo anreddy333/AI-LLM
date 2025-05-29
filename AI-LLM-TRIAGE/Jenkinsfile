@@ -12,6 +12,8 @@ pipeline {
                 sh '''
                     sudo apt-get update
                     sudo apt-get install -y curl
+                    sudo python3 -m venv venv
+                    sudo source venv/bin/activate
                     sudo pip install --no-cache-dir -r requirements.txt
                     sudo python -m playwright install --with-deps chromium
                 '''
@@ -20,7 +22,7 @@ pipeline {
         stage('Test') {
             steps {
                 sh '''
-                    pytest tests/test_gmail_login.py --junitxml=test-results.xml >> build.log 2>&1 || exit 1
+                    sudo pytest tests/test_gmail_login.py --junitxml=test-results.xml >> build.log 2>&1 || exit 1
                 '''
             }
         }

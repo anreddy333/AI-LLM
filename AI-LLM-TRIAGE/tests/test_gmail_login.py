@@ -7,7 +7,7 @@ def test_gmail_login(page: Page):
     page.fill("input#identifierId", "test.user@gmail.com")  # Placeholder email
     page.click("button:has-text('Next')")
 
-    page.wait_for_selector("input[name='Passwd']", timeout=10000)
+    page.wait_for_selector("input[name='IncorrectPasswd']", timeout=10000)
     page.fill("input[name='Passwd']", "testpassword")  # Placeholder password
     page.click("button:has-text('Next')")
 

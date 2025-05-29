@@ -27,69 +27,65 @@ pipeline {
     post {
         always {
             archiveArtifacts artifacts: 'test-results.xml,build.log', allowEmptyArchive: true
+            cleanWs()
         }
         failure {
             script {
-                // Capture and filter console log
                 def consoleLog
                 try {
                     consoleLog = readFile('build.log') ?: 'No log available'
-                    consoleLog = consoleLog.split('\n').findAll { 
-                        it.contains('ERROR') || it.contains('FAIL') || it.contains('exception') || it.contains('not found')
-                    }.join('\n')
+                    consoleLog += "\nPipeline console log:\n${currentBuild.rawBuild.getLog(1000).join('\n')}"
+                    consoleLog = consoleLog.split('\n').findAll {
+                        it.contains('ERROR') || it.contains('FAIL') || it.contains('exception') ||
+                        it.contains('not found') || it.contains('fatal') || it.contains('timeout') ||
+                        it.contains('refused') || it.contains('sudo') || it.contains('cd:')
+                    }.join('\n') ?: 'No error details found in logs'
                     if (consoleLog.length() > 5000) {
                         consoleLog = consoleLog.substring(0, 5000) + '\n[Log truncated]'
                     }
-                    if (!consoleLog) {
-                        consoleLog = 'No error details found in log'
-                    }
                 } catch (Exception e) {
-                    consoleLog = "Failed to read log: ${e.message}"
+                    consoleLog = "Failed to read logs: ${e.message}"
                 }
 
-                // Prepare prompt for LLM
-                def prompt = """
-                Triage the following Jenkins pipeline error log and identify the cause of the failure. Suggest possible fixes or next steps for debugging. Keep the response concise and structured:
-                - **Failure Cause**: [Describe the root cause]
-                - **Suggested Fix**: [Provide actionable steps]
-                - **Additional Notes**: [Optional context or warnings]
-                
-                Error Log:
-                ${consoleLog}
-                """
-
-                // Send log to LLM with retry and longer timeout
                 def llmResponse = 'No response from LLM'
                 try {
+                    echo "Attempting to contact LLM server..."
                     retry(3) {
-                        echo "Attempting to contact LLM server..."
                         def response = httpRequest(
-                            url: 'http://10.18.2.4:5000/generate',
+                            url: 'http://10.1.148.59:5000/generate',
                             httpMode: 'POST',
                             contentType: 'APPLICATION_JSON',
                             requestBody: groovy.json.JsonOutput.toJson([
                                 model: 'codellama',
-                                prompt: prompt
+                                prompt: """
+                                Triage the following Jenkins pipeline error log and identify the cause of the failure. Suggest possible fixes or next steps for debugging. Keep the response concise and structured:
+                                - **Failure Cause**: [Describe the root cause]
+                                - **Suggested Fix**: [Provide actionable steps]
+                                - **Additional Notes**: [Optional context or warnings]
+                                
+                                Error Log:
+                                ${consoleLog}
+                                """
                             ]),
                             validResponseCodes: '200:299',
-                            timeout: 120,
-                            noProxyHost: '10.18.2.4'
+                            timeout: 180,
+                            consoleLogResponseBody: true,
+                            customHeaders: [[name: 'Connection', value: 'keep-alive']]
                         )
                         llmResponse = response.content ?: 'Empty response from LLM'
                         echo "Received LLM response: ${llmResponse.take(100)}..."
                     }
                 } catch (Exception e) {
-                    echo "Failed to contact LLM: ${e.message}"
-                    llmResponse = "Error: Failed to contact LLM server - ${e.message}"
+                    llmResponse = "Error: Failed to contact LLM server - ${e.message}\n\nLog for manual triage:\n${consoleLog}"
+                    echo "LLM error: ${e.message}"
                 }
 
-                // Save and archive response
                 writeFile file: 'llm-triage-result.txt', text: llmResponse
+                sh "ls -la llm-triage-result.txt || echo 'File not found'"
+                sh "cat llm-triage-result.txt || echo 'Failed to read file'"
+                sh "pwd && ls -la ${WORKSPACE}"
                 archiveArtifacts artifacts: 'llm-triage-result.txt', allowEmptyArchive: true
             }
-        }
-        always {
-            cleanWs()
         }
     }
 }

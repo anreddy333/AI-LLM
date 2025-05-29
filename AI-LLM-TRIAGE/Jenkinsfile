@@ -13,6 +13,7 @@ pipeline {
                     sudo apt-get update
                     sudo apt-get install -y curl
                     sudo python3 -m venv venv
+                    ls
                     sudo ./venv/bin/activate
                     sudo pip install --no-cache-dir -r requirements.txt
                     sudo python -m playwright install --with-deps chromium

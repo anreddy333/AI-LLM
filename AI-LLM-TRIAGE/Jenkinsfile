@@ -17,10 +17,10 @@ pipeline {
             steps {
                 sh '''
                     # Use bash to support "source"
-                            bash -c "
+                    bash -c "
                     sudo apt-get update &&
                     sudo apt-get install -y curl python3-venv
-
+                    "
                 '''
             }
         }
@@ -29,7 +29,7 @@ pipeline {
             steps {
                 sh '''
                     python3 -m venv ${VENV_PATH} &&
-                    source ${VENV_PATH}/bin/activate
+                    source ${VENV_PATH}/bin/activate &&
                     pytest tests/test_gmail_login.py --junitxml=test-results.xml >> build.log 2>&1 || exit 1
                 '''
             }
@@ -98,7 +98,7 @@ When given a Jenkins pipeline failure, you will:
 **Key Evidence**:
 ${consoleLog}
 
-**Test Code Review** _(none provided)_:
+**Test Code Review** _(none provided)_:  
 
 **Next Steps if Unresolved**:
 - <idea 1>
@@ -134,4 +134,3 @@ ${consoleLog}
         }
     }
 }
- 

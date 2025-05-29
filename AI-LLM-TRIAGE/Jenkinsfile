@@ -7,20 +7,15 @@ pipeline {
     }
 
     stages {
-        stage('Checkout SCM') {
-            steps {
-                checkout scm
-            }
-        }
-
         stage('Setup') {
             steps {
                 sh '''
-                    # Use bash to support "source"
-                    bash -c "
-                    sudo apt-get update &&
+                    sudo apt-get update
                     sudo apt-get install -y curl python3-venv
-                    "
+                    python3 -m venv ${VENV_PATH}
+                    . ${VENV_PATH}/bin/activate
+                    pip install --no-cache-dir -r requirements.txt
+                    python -m playwright install --with-deps chromium
                 '''
             }
         }
@@ -28,8 +23,7 @@ pipeline {
         stage('Test') {
             steps {
                 sh '''
-                    python3 -m venv ${VENV_PATH} &&
-                    source ${VENV_PATH}/bin/activate &&
+                    . ${VENV_PATH}/bin/activate
                     pytest tests/test_gmail_login.py --junitxml=test-results.xml >> build.log 2>&1 || exit 1
                 '''
             }
@@ -58,7 +52,8 @@ pipeline {
                         it.toLowerCase().contains('timeout') ||
                         it.toLowerCase().contains('refused') ||
                         it.toLowerCase().contains('cd:') ||
-                        it.toLowerCase().contains('sudo')
+                        it.toLowerCase().contains('sudo') ||
+                        it.toLowerCase().contains('exit code')
                     }
 
                     consoleLog = errorLines.take(50).join('\n')
@@ -98,7 +93,7 @@ When given a Jenkins pipeline failure, you will:
 **Key Evidence**:
 ${consoleLog}
 
-**Test Code Review** _(none provided)_:  
+**Test Code Review** _(none provided)_:
 
 **Next Steps if Unresolved**:
 - <idea 1>

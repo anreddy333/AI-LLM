@@ -1,13 +1,12 @@
 pipeline {
-    agent {
-            any
-    }
+    agent any
+    
     stages {
         stage('Checkout SCM') {
-                    steps {
-                        checkout scm
-                    }
-                }
+            steps {
+                checkout scm
+            }
+        }
         stage('Setup') {
             steps {
                 sh '''

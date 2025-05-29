@@ -39,7 +39,6 @@ pipeline {
     post {
         always {
             archiveArtifacts artifacts: 'test-results.xml,build.log', allowEmptyArchive: true
-            cleanWs()
         }
 
         failure {
@@ -129,7 +128,7 @@ ${consoleLog}
                 }
 
                 writeFile file: 'llm-triage-result.txt', text: llmResponse
-                sh "cat llm-triage-result.txt || echo 'Failed to read file'"
+                sh "ls llm-triage-result.txt || echo 'Failed to read file'"
                 archiveArtifacts artifacts: 'llm-triage-result.txt', allowEmptyArchive: true
             }
         }

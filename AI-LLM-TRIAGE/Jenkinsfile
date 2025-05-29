@@ -83,12 +83,7 @@ pipeline {
                             **Recommended Fix**:
                             1. <step 1>
                             2. <step 2>
-                            3. <step 3>
-                            
-                            **Key Evidence**:
-                            **Test Code Review**${failedTest ? "" : " _(none provided)_"}:
-
-                            
+                            3. <step 3>                            
                             
                             <if provided: show faulty lines + correction suggestion>
                             
@@ -101,10 +96,7 @@ pipeline {
 
                             **Console Log (truncated)** 
                             ${consoleLog}
-
-                            ${failedTest ? "🔹 **Suspect Test Snippet** 🔹\n```groovy\n${failedTest}\n```" : ""}
-
-                                """
+                            """
                             ]),
                             validResponseCodes: '200:299',
                             timeout: 180,

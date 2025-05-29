@@ -7,6 +7,15 @@ pipeline {
     }
 
     stages {
+        stage('Checkout SCM') {
+            steps {
+                checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: '*/main']],
+                    userRemoteConfigs: [[url: 'https://github.com/anreddy333/AI-LLM']]
+                ])
+            }
+        }
         stage('Setup') {
             steps {
                 sh '''

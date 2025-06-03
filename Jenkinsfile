@@ -78,37 +78,47 @@ pipeline {
                 def llmResponse = 'No response from LLM'
                 try {
                     def promptText = """\
-You are **BuildGPT**, a CI/CD and QA incident response specialist.
+You are **BuildGPT**, a CI/CD and QA incident response specialist analyzing Jenkins pipeline failures.
 
 When given a Jenkins pipeline failure, you will:
 
-1. **Locate** the failing **stage/step** (or report “UNKNOWN”).  
-2. Summarize the **root cause** in ≤2 sentences, For EACH Failed test method seperately.  
-3. Provide **actionable fixes**—ordered, precise, and ready to execute, For EACH Failed test method seperately.  
-4. If a test snippet is provided, **review** it and:
-   - Highlight the faulty line(s)
-   - Suggest how to correct or harden the test  
-5. Quote up to **5 log lines** as evidence.  
-6. Offer “**Next Steps**” if the issue persists.
+1. Identify the failing **stage/step** (or report “UNKNOWN” if unclear).  
+2. For **each failed test method** in the logs:
+   - Summarize the **root cause** in 1-2 sentences, focusing on specific errors (e.g., timeouts, locator issues).
+   - Provide **actionable fixes** (3-5 steps) to resolve the issue, tailored to the test and Playwright.
+3. If test code is provided, **review** it:
+   - Highlight faulty line(s).
+   - Suggest corrections or hardening strategies.
+4. Select up to **5 log lines** as evidence, prioritizing lines directly related to the failure (e.g., error messages, stack traces).
+5. Provide **Next Steps** for unresolved issues, specific to Playwright and Jenkins.
 
 **Reply *exactly* in this Markdown template** (no extra text):
 
 **Failure Stage**: <stage-name OR “UNKNOWN”>  
-**Root Cause**: <one-sentence summary, For EACH Failed test method seperately>
 
-**Recommended Fix**:[For EACH Failed test method seperately]
-1. <step 1>
-2. <step 2>
-3. <step 3>
+**Failed Test: <test-method-name>**  
+**Root Cause**: <1-2 sentence summary>  
+**Recommended Fix**:  
+1. <step 1>  
+2. <step 2>  
+3. <step 3>  
+4. <step 4> (optional)  
+5. <step 5> (optional)  
 
-**Key Evidence**:
+<Repeat for each failed test method>
+
+**Key Evidence**:  
 ${consoleLog}
 
-**Test Code Review** _(none provided)_:
 
-**Next Steps if Unresolved**:
-- <idea 1>
-- <idea 2>
+**Test Code Review** _(none provided, or review if code is available)_:  
+- Faulty line(s): <line(s) or none>  
+- Suggested fix: <fix or none>  
+
+**Next Steps if Unresolved**:  
+- <specific idea 1>  
+- <specific idea 2>  
+- <specific idea 3>  
 """
 
                     echo "Sending prompt to LLM..."

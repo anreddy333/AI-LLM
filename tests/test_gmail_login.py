@@ -42,29 +42,29 @@ if __name__ == "__main__":
     pytest.main()
 
 
-# def test_gmail_login_success(page: Page):
-#     page.goto("https://mail.google.com")
+def test_gmail_login_success(page: Page):
+    page.goto("https://mail.google.com")
     
-#     page.fill("input#identifierId", "test.sds0003@gmail.com")
-#     page.click("//span[normalize-space()='Next']")
+    page.fill("input#identifierId", "test.sds0003@gmail.com")
+    page.click("//span[normalize-space()='Next']")
     
-#     page.wait_for_selector("input[name='Passwd']", timeout=10000)
-#     page.fill("input[name='Passwd']", "test@0003")  
-#     page.click("//span[normalize-space()='Next']")
+    page.wait_for_selector("input[name='Passwd']", timeout=10000)
+    page.fill("input[name='Passwd']", "test@0003")  
+    page.click("//span[normalize-space()='Next']")
     
-#     page.wait_for_selector("img[alt='Gmail']", timeout=10000)
-#     expect(page.locator("img[alt='Gmail']")).to_be_visible()
+    page.wait_for_selector("img[alt='Gmail']", timeout=10000)
+    expect(page.locator("img[alt='Gmail']")).to_be_visible()
 
-# def test_forgot_email_link(page: Page):
-#     page.goto("https://mail.google.com")
+def test_forgot_email_link(page: Page):
+    page.goto("https://mail.google.com")
 
-#     forgot_email = page.locator("//button[normalize-space()='Forgot email?']")
-#     expect(forgot_email).to_be_visible()    
-#     forgot_email.click()
+    forgot_email = page.locator("//button[normalize-space()='Forgot email?']")
+    expect(forgot_email).to_be_visible()    
+    forgot_email.click()
     
-# def test_create_account_link(page: Page):
-#     page.goto("https://mail.google.com")
+def test_create_account_link(page: Page):
+    page.goto("https://mail.google.com")
     
-#     create_account_link = page.locator("//span[normalize-space()='Create account']")
-#     expect(create_account_link).to_be_visible()
-#     create_account_link.click()
+    create_account_link = page.locator("//span[normalize-space()='Create account']")
+    expect(create_account_link).to_be_visible()
+    create_account_link.click()

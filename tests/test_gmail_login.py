@@ -1,4 +1,6 @@
 import pytest
+from playwright.sync_api import Page, expect
+
 
 # Function to check if a number is even or odd
 def check_even_odd(number):
@@ -38,10 +40,6 @@ def test_odd():
 # Running the tests
 if __name__ == "__main__":
     pytest.main()
-
-
-import pytest
-from playwright.sync_api import Page, expect
 
 
 def test_gmail_login_success(page: Page):

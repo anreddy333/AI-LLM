@@ -35,7 +35,7 @@ pipeline {
             steps {
                 sh '''
                     . ${VENV_PATH}/bin/activate
-                    ls -l build.log
+                    ls
                     pytest tests/test_gmail_login.py --junitxml=test-results.xml > build.log 2>&1 || exit 1
                 '''
             }

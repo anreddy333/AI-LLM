@@ -7,6 +7,11 @@ pipeline {
     }
 
     stages {
+            stage('Clean Workspace') {
+            steps {
+                deleteDir()
+            }
+        }
         stage('Checkout SCM') {
             steps {
                 checkout scm
@@ -30,7 +35,8 @@ pipeline {
             steps {
                 sh '''
                     . ${VENV_PATH}/bin/activate
-                    pytest tests/test_gmail_login.py --junitxml=test-results.xml >> build.log 2>&1 || exit 1
+                    ls -l build.log
+                    pytest tests/test_gmail_login.py --junitxml=test-results.xml > build.log 2>&1 || exit 1
                 '''
             }
         }

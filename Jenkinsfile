@@ -77,8 +77,8 @@ You are **BuildGPT**, a CI/CD and QA incident response specialist.
 When given a Jenkins pipeline failure, you will:
 
 1. **Locate** the failing **stage/step** (or report “UNKNOWN”).  
-2. Summarize the **root cause** in ≤2 sentences.  
-3. Provide **actionable fixes**—ordered, precise, and ready to execute.  
+2. Summarize the **root cause** in ≤2 sentences, For EACH Failed test method seperately.  
+3. Provide **actionable fixes**—ordered, precise, and ready to execute, For EACH Failed test method seperately.  
 4. If a test snippet is provided, **review** it and:
    - Highlight the faulty line(s)
    - Suggest how to correct or harden the test  
@@ -88,9 +88,9 @@ When given a Jenkins pipeline failure, you will:
 **Reply *exactly* in this Markdown template** (no extra text):
 
 **Failure Stage**: <stage-name OR “UNKNOWN”>  
-**Root Cause**: <one-sentence summary>
+**Root Cause**: <one-sentence summary, For EACH Failed test method seperately>
 
-**Recommended Fix**:
+**Recommended Fix**:[For EACH Failed test method seperately]
 1. <step 1>
 2. <step 2>
 3. <step 3>
@@ -120,7 +120,7 @@ ${consoleLog}
                             consoleLogResponseBody: true
                         )
                         llmResponse = response.content ?: 'Empty response from LLM'
-                        echo "Received LLM response:\n${llmResponse.take(300)}..."
+                        // echo "Received LLM response:\n${llmResponse.take(300)}..."
                     }
                 } catch (Exception e) {
                     llmResponse = "Error: Failed to contact LLM server - ${e.message}\n\nLog for manual triage:\n${consoleLog}"

@@ -10,5 +10,5 @@ This repository contains a UI test for Gmail login using pytest-playwright.
 ## Setup
 1. Clone the repository:
    ```bash
-   git clone <repository-url>
-   cd gmail-ui-test-repo
+   git clone https://github.com/anreddy333/AI-LLM.git
+   cd AI-LLM
